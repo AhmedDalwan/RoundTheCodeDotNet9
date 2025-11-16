@@ -1,9 +1,14 @@
 using System.Net;
+using RoundTheCodeDotNet9.Interfaces;
+using RoundTheCodeDotNet9.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddKeyedSingleton<IMyService, MySingletonService>("singleton");
+builder.Services.AddKeyedScoped<IMyService, MyScopedService>("scoped");
 
 var app = builder.Build();
 
