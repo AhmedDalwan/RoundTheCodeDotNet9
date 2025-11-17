@@ -17,12 +17,32 @@ namespace RoundTheCodeDotNet9.Middlewares
             _mySingletonService = mySingletonService;
         }
 
-        public Task Invoke(HttpContext context, [FromKeyedServices("scoped")] IMyService myScopedService)
+        public async Task Invoke(HttpContext context, [FromKeyedServices("scoped")] IMyService myScopedService)
         {
+            // Query parameters
+            var page = context.Request.Query["page"];
+
+            // Route parameters
+            var id = context.Request.RouteValues["id"]?.ToString();
+
+            // Headers
+            var token = context.Request.Headers["Authorization"].ToString();
+
+            // Body
+            context.Request.EnableBuffering();
+            using var reader = new StreamReader(context.Request.Body, leaveOpen: true);
+            string body = await reader.ReadToEndAsync();
+            context.Request.Body.Position = 0;
+
+            Console.WriteLine($"Query page = {page}");
+            Console.WriteLine($"Route id = {id}");
+            Console.WriteLine($"Header token = {token}");
+            Console.WriteLine($"Body = {body}");
+
             //Console.WriteLine("Singleton: " + _mySingletonService.Name);
             //Console.WriteLine("Scoped: " + myScopedService.Name);
 
-            return _next(context);
+            await _next(context);
         }
     }
 }
